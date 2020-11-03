@@ -1,0 +1,10 @@
+name: binder
+dependencies:
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib
+  - pip
+  - pip:
+    - nbserverproxy
+    - jupyter-server-proxy
