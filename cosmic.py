@@ -47,8 +47,8 @@ def Proximo(iterador): #DONE
 
 def HistogramaPorHora(df,dia=29):
     data_frame = df.copy()
-    df["hora"] = df.Timestamp.dt.hour
-    df["dia"] = df.Timestamp.dt.day
+    data_frame["hora"] = data_frame.Timestamp.dt.hour
+    data_frame["dia"] = data_frame.Timestamp.dt.day
     events = data_frame[data_frame["dia"]==dia]["hora"].value_counts(sort=False).to_frame()
     fig= plt.figure(figsize=(10,6))
     plt.bar(x=events.index, height=events.hora, label="Dia "+str(dia))
@@ -59,10 +59,10 @@ def HistogramaPorHora(df,dia=29):
 
 def HistogramaPorMinuto(df,dia=29, hora=18):
     data_frame = df.copy()
-    df["hora"] = df.Timestamp.dt.hour
-    df["dia"] = df.Timestamp.dt.day
-    df["minuto"] = df.Timestamp.dt.minute
-    df["bin"] =df.minuto.map(lambda minuto: int(minuto/5))
+    data_frame["hora"] = data_frame.Timestamp.dt.hour
+    data_frame["dia"] = data_frame.Timestamp.dt.day
+    data_frame["minuto"] = data_frame.Timestamp.dt.minute
+    data_frame["bin"] =data_frame.minuto.map(lambda minuto: int(minuto/5))
     events = data_frame[(data_frame["dia"]==dia) & (data_frame["hora"] == hora)]["bin"].value_counts(sort=False).to_frame()
     fig= plt.figure(figsize=(10,6))
     plt.bar(x=events.index, height=events.bin, label="Hora "+str(hora))
@@ -73,9 +73,37 @@ def HistogramaPorMinuto(df,dia=29, hora=18):
 
 def MediaPorHora(df,dia=29):
     data_frame = df.copy()
-    df["hora"] = df.Timestamp.dt.hour
-    df["dia"] = df.Timestamp.dt.day
+    data_frame["hora"] = data_frame.Timestamp.dt.hour
+    data_frame["dia"] = data_frame.Timestamp.dt.day
     events = data_frame[data_frame["dia"]==dia]["hora"].value_counts(sort=False).to_frame()
     print("Média diária:" +str(events.hora.mean()))
     print(events)
-   
+
+def Histograma(df, dia=29, bin=10):
+    data_frame = df.copy()
+    data_frame["hora"] = data_frame.Timestamp.dt.hour.astype(str)
+    data_frame["hora"] = data_frame["hora"].map(lambda h: h.zfill(2))
+    data_frame["dia"] = data_frame.Timestamp.dt.day
+    data_frame["minuto"] = data_frame.Timestamp.dt.minute
+    data_frame["bin"] =data_frame.minuto.map(lambda minuto: int(minuto/bin))
+    data_frame["bin"] = bin*data_frame["bin"]
+    data_frame["bin"] = data_frame["bin"].astype(str)
+    data_frame["bin"] = data_frame["bin"].map(lambda h: h.zfill(2))
+    data_frame["bin"] =  data_frame['hora'] + ":" + data_frame['bin']
+    dfn = data_frame[data_frame["dia"]==dia]
+    events = dfn.bin.value_counts(sort=False).to_frame()
+    events = events.sort_index()
+    x = dfn["hora"].unique() + ":00"
+    if events.index[0] != x[0]:
+        x = np.delete(x, 0)
+    fig= plt.figure(figsize=(20,6))
+    plt.plot(events.index, events.bin)
+    plt.xlim([events.index[0],events.index[-1]])
+    plt.title("DIA "+str(dia))
+    plt.xlabel("Horas")
+    plt.ylabel("Quantidade de Eventos")
+    plt.xticks(x)
+    plt.show()
+    
+
+    
